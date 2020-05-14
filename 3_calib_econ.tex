@@ -1,0 +1,281 @@
+\section{Calibration of the economic component}
+
+\subsection{Positive Mathematical Programming}
+
+The PMP approach assumes that farmers allocate limited land and water resources with the objective of maximizing net revenues, and thus past observations of land and water use by crop ($\overline{x}_{land,i}, \overline{x}_{water,i}$) are solutions to the problem in Eq. \eqref{eq:net_revs}. During calibration, Eq. \eqref{eq:net_revs} is modified to constrain the maximization problem to the observed levels of land and water allocation:
+
+\begin{multline}\label{eq:net_revs_calib}
+        \max_{ x_{land,i} , x_{water,i} } net = \quad \sum_i \left\{ p_i \pi_i\left( x_{land,i}, x_{water,i}; \mu_i, \beta_{land,i},\beta_{water,i}, \rho_{i}, \delta_{i} \right) -  c_{land,i} x_{land,i} - c_{water,i} x_{water,i} \right\} \\
+    \text{subject to: }\\ \quad\sum_{i} x_{land,i} \leq \overline{L} \left[ \overline{ \lambda }_{fsl} \right]\\
+    x_{land,i} = \overline{x}_{land,i} \left[ { \lambda }_{land,i} \right]\\
+    x_{water,i} = \overline{x}_{water,i} \left[ { \lambda }_{water,i} \right]\\
+    x_{land,i} , x_{water,i} \geq 0\\
+\end{multline}
+
+
+Equation \eqref{eq:net_revs_calib} contains seven parameters per crop: five production function parameters  $\mu_i, \beta_{i,land}, \beta_{i,water}, \rho_i, \delta_i$, and two Lagrange multipliers associated with the observed land and water-use constraints $\lambda_{i, land}, \lambda_{i,water}$, for a total of 7 unknown parameters to be calibrated based on observed decision making. An additional parameter, $\overline{\lambda_{fsl}}$ associated with the land resource constraint also needs to be calibrated. This parameter represents the shadow value for the total amount of land available for crop production.  %Parameter $\overline{\lambda_{fsl}}$, $\lambda_{land,i}$ and $\lambda_{water,i}$ are Lagrange multipliers associated with the resource constraints. 
+The PMP methodology builds the system of optimality conditions associated with Eq. \eqref{eq:net_revs_calib}, however instead of solving the maximization problem to find optimal land and water resource allocation, the method fixes these at the observed allocation levels and solves the system of optimality conditions for the model parameters. In essence, the PMP methodology finds the parameters that produce a response surface (net revenue function) that is maximum at the observed resource allocation levels ($\overline{x}_{land,i}, \overline{x}_{water,i}$). Eq. \ref{eq:net_revs_calib} is differentiable and traditionally solved using nonlinear programming methods. Necessary and sufficient optimality conditions are given by the first order derivatives of Eq. \ref{eq:net_revs_calib} with respect to $x_{land,i}$ and $x_{water,i}$, the Karush-Kuhn-Tucker conditions to enforce constraints, and a few additional constraints to ensure the solution to the maximization problem exists and is unique.  A programming solution to Eq. \ref{eq:net_revs_calib}, proposed by Merel et al. \citet{Merel2011b} and used in this study, is provided in \ref{app:economic_model_calib}.  
+
+
+
+\subsection{Stochastic Recursive Parameter Estimation}
+
+Instead of solving the program proposed by Merel et al. \citet{Merel2011b} and Garnache et al. \citep{Garnache2017}, we embed the optimality conditions within a stochastic data assimilation framework that permits the recursive calibration of the model parameters. \citet{Maneta2014} describe a discrete Monte Carlo recursive Bayesian estimator that permits to update the parameters as new observations become available at time $k$. The proposed methodology has three important advantages: 1) its probabilistic nature permits to include noisy observations (e.g. remotely sensed retrievals of agricultural activity) in the parameter estimation process; 2) it provides a posterior parameter distribution that integrates old and new information; and 3) it does not require the history of observations to update the calibration when new observations are obtained. 
+
+The equations of the estimator are based on the ensemble Kalman Filter, enKF \citep{Evensen1994}, where the probability distribution of parameters, inputs and observations are represented by a Monte Carlo sample. The exception is parameter $\rho_i$, a function of $\sigma_i$, which controls the elasticity of substitution between land and water. This parameter is fixed at a value $\rho_i = \frac{\sigma_i - 1}{\sigma_i}$, with $\sigma_i$ values typically in the range of 0.1 to 0.6, which represents limited substitution between these two resources. The reason for fixing this parameter is that elasticity of substitution has been found to be insensitive to aggregated observations and requires more detailed experimental data for its identification. Therefore, our approach stochastically tracks seven parameters, six parameters that need to be calibrated for each crop, and one unit-level resource constraint parameter ($\overline{\lambda}_{fsl}$). Specifically, the probability distribution of the model parameters $\*\theta = \{\*\mu,\allowbreak \*\beta_{land},\allowbreak \*\beta_{water}, \*\delta,\allowbreak \*\lambda_{land},\allowbreak \*\lambda_{water},\allowbreak \overline{\lambda}_{fsl}\}$ is represented by a random ensemble of $M$ members $m=1,...,M$ of $\*\theta$. Except for $\overline{\lambda}_{fsl}$, the unit-level parameter, each bold parameter in the $\*\theta$ set is an array with rows representing parameter values for each crop grown in a given economic unit (e.g. county, irrigation district) and each column is an individual member of the ensemble.
+
+To set the filter equations, we treat model parameters as if they were the system states of the standard enKF. The evolution of parameters (forecasts) from period $k$ to $k+1$ is produced by adding a random perturbation to each member of the ensemble. The addition of artificial noise to each ensemble member to simulate time dynamics results in an overdispersed ensemble that overestimates the parameter variance \citep{West1993}. This is because the intrinsic variance of the ensemble is compounded by the noise added to each member to perform the random walk. Liu and West \citep{West1993} show that this can be corrected by using perturbations that are proportional to the ensemble variance by a number $h$ slightly smaller than one, and shrinking the ensemble toward its mean by a factor $a = \sqrt{1-h}$. For a given crop $i$,  the dynamics of members of the parameter ensemble with shrinkage is:   
+
+% \begin{equation}\label{eq:param_evolution}
+%     \underbrace{\begin{bmatrix}
+%     \*\mu_{k+1}^{m}\\ 
+%     \*\beta_{land,k+1}^{m}\\ 
+%     \*\beta_{water,k+1}^{m}\\ 
+%     \*\delta_{k+1}^{m}\\ 
+%     \*\lambda_{land,k+1}^{m}\\ 
+%     \*\lambda_{water,k+1}^{m}\\ 
+%     \overline{\lambda}_{fsl,k+1}^{m}\\
+%     \end{bmatrix}}_{\*\theta_{k+1}^m} = a
+%     \begin{bmatrix}
+%     \*\mu_k^{m+}\\ 
+%     0\\ 
+%     0\\ 
+%     \*\delta_k^{m+}\\ 
+%     \*\lambda_{land,k}^{m+}\\ 
+%     \*\lambda_{water,k}^{m+}\\ 
+%     \overline{\lambda}_{fsl,k}^{m+}\\
+%     \end{bmatrix} + (1 - a)
+%     \begin{bmatrix}
+%     \mathbb{E}[\*\mu_{k}^+]\\ 
+%     0\\
+%     0\\ 
+%     \mathbb{E}[\*\delta_k^{+}]\\ 
+%     \mathbb{E}[\*\lambda_{land,k}^{+}]\\ 
+%     \mathbb{E}[\*\lambda_{water,k}^{+}]\\ 
+%     \mathbb{E}[\overline{\lambda}_{fsl,k}^{+}]\\
+%     \end{bmatrix} +
+%     \begin{bmatrix*}[l]
+%     \*\zeta_{k}^\mu\\ 
+%     \*\zeta_{k}^{\beta_{land}}\\
+%     \*\zeta_{k}^{\beta_{water}}\\
+%     \*\zeta_{k}^\delta\\
+%     \*\zeta_{k}^{\lambda_{land}}\\
+%     \*\zeta_{k}^{\lambda_{water}}\\
+%     \*\zeta_{k}^{\overline{\lambda}_{fsl}}
+%     \end{bmatrix*}\text{,} \qquad 
+%     \begin{matrix*}[l]
+%     &\*\zeta_k^\mu \sim \mathcal{N}\left(0, h^2\*Z_k^{\*\mu} \right)\\
+%     &\*\zeta_{k}^{\beta_{land}} \sim \mathcal{B}\left(\hat{\*a}(\*\beta_{land,k}^{+}), \hat{\*b}(\*\beta_{land,k}^{+}) \right)\\
+%     &\*\zeta_{k}^{\beta_{water}} \sim \mathcal{B}\left(\hat{\*a}(\*\beta_{water,k}^{+}), \hat{\*b}(\*\beta_{water,k}^{+}) \right)\\
+%     &\*\zeta_{k}^\delta \sim \mathcal{N}\left(0, h^2\*Z_{k}^{\*\delta} \right)\\
+%     &\*\zeta_{k}^{\lambda_{land}} \sim \mathcal{N}\left(0, h^2\*Z_{k}^{\*\lambda_{land}} \right)\\
+%     &\*\zeta_{k}^{\lambda_{water}} \sim \mathcal{N}\left(0, h^2\*Z_{k}^{\*\lambda_{water}} \right)\\
+%     &\*\zeta_{k}^{\overline{\lambda}_{fsl}} \sim \mathcal{N}\left(0, h^2\*Z_{k}^{\overline{\lambda}_{fsl}} \right)
+%     \end{matrix*}
+% \end{equation}
+
+\begin{equation}\label{eq:param_evolution}
+    \underbrace{\begin{bmatrix}
+    \beta_{land,i,k+1}^{m}\\ 
+    \beta_{water,i,k+1}^{m}\\
+    \mu_{i,k+1}^{m}\\ 
+    \delta_{i,k+1}^{m}\\ 
+    \lambda_{land,i,k+1}^{m}\\ 
+    \lambda_{water,i,k+1}^{m}\\ 
+    \overline{\lambda}_{fsl,k+1}^{m}\\
+    \end{bmatrix}}_{\*\theta_{i,k+1}^m} = a
+    \begin{bmatrix}
+    0\\ 
+    0\\
+    \mu_{i,k}^{m+}\\ 
+    \delta_{i,k}^{m+}\\ 
+    \lambda_{land,i,k}^{m+}\\ 
+    \lambda_{water,i,k}^{m+}\\ 
+    \overline{\lambda}_{fsl,k}^{m+}\\
+    \end{bmatrix} + (1 - a)
+    \begin{bmatrix}
+    0\\
+    0\\
+    \mathbb{E}[\*\mu_{i,k}^+]\\ 
+    \mathbb{E}[\*\delta_{i,k}^{+}]\\ 
+    \mathbb{E}[\*\lambda_{land,i,k}^{+}]\\ 
+    \mathbb{E}[\*\lambda_{water,i,k}^{+}]\\ 
+    \mathbb{E}[\overline{\*\lambda}_{fsl,k}^{+}]\\
+    \end{bmatrix} +
+    \begin{bmatrix*}[l]
+    \zeta_{i,k}^{\beta_{land}}\\
+    \zeta_{i,k}^{\beta_{water}}\\
+    \zeta_{i,k}^\mu\\ 
+    \zeta_{i,k}^\delta\\
+    \zeta_{i,k}^{\lambda_{land}}\\
+    \zeta_{i,k}^{\lambda_{water}}\\
+    \zeta_{k}^{\overline{\lambda}_{fsl}}
+    \end{bmatrix*}\text{,} \qquad 
+    \begin{matrix*}[l]
+    &\zeta_{i,k}^{\beta_{land}} \sim \mathcal{B}\left(\hat{a}_i(\*\beta_{land,k}^{+}), \hat{b}_i(\*\beta_{land,k}^{+}) \right)\\
+    &\zeta_{i,k}^{\beta_{water}} \sim \mathcal{B}\left(\hat{a}_i(\*\beta_{water,k}^{+}), \hat{b}_i\*\beta_{water,k}^{+}) \right)\\
+    &\zeta_{i,k}^\mu \sim \mathcal{N}\left(0, h^2\mathbb{V}[\mu_{i,k}^+] \right)\\
+    &\zeta_{i,k}^\delta \sim \mathcal{N}\left(0, h^2\mathbb{V}[\delta_{i,k}^+] \right)\\
+    &\zeta_{i,k}^{\lambda_{land}} \sim \mathcal{N}\left(0, h^2\mathbb{V}[\lambda_{land,i,k}^+] \right)\\
+    &\zeta_{i,k}^{\lambda_{water}} \sim \mathcal{N}\left(0, h^2\mathbb{V}[\lambda_{water,i,k}^+] \right)\\
+    &\zeta_{k}^{\overline{\lambda}_{fsl}} \sim \mathcal{N}\left(0, h^2\mathbb{V}[\overline{\lambda}_{fsl,k}^+] \right)
+    \end{matrix*},
+\end{equation}
+
+\noindent where superscript $m$ over a a parameter indicates it is the $m$th ensemble member at the time indicated by the subscript $k$, and superscript $+$ indicates the parameter is corrected (posterior) after data assimilation at time $k$ (see below); $a$ and $h$ are shrinkage and variance smoothing parameters, respectively; $\mathbb{E}[\cdot]$ is the expectation operator of the parameter ensemble (i.e. ensemble average for the given parameter and crop), and operator $\mathbb{V}[\cdot]$ is the parameter ensemble variance. Parameters $\mu, \delta, \lambda_{land}, \lambda_{water} \text{ and } \overline{\lambda}_{fsl}$ are sampled using normally distributed noise, however the $\beta$ parameters are bound to values in the range [0,1]. To sample the distribution of these parameters at $k+1$ we used a Beta distribution with two shape parameters, $\hat{a}, \hat{b}$ centered at each ensemble member. The parameters that center the distribution at each member are determined using the method of moments from the mean and the variance of each individual ensemble member: 
+
+% \begin{equation}\label{eq:beta_params}
+%     \begin{split}
+%     &\hat{\*a}(\*\beta) = \left[\hat{a}_i(\*\beta), \dots, \hat{a}_I(\*\beta) \right]^T, \qquad \hat{a}_i(\*\beta) = \overline{\*\beta}_i^m\left(\frac{\overline{\*\beta}_i^m(1-\overline{\*\beta}_i^m)}{\*Z^{\*\beta}_{ii}} -1 \right)\\
+%     &\hat{\*b}(\*\beta) = \left[\hat{b}_i(\*\beta), \dots, \hat{b}_I(\*\beta) \right]^T, \qquad \hat{b}_i(\*\beta) = (1-\overline{\beta}_i^m)\hat{a}_i(\beta_i),
+%     \end{split}
+% \end{equation}
+\begin{equation}\label{eq:beta_params}
+    \begin{split}
+    &\hat{a}_i(\beta_{\cdot}) = <\*\beta_{\cdot,i}^m>\left(\frac{<\*\beta_{\cdot,i}^m>(1-<\*\beta_{\cdot,i}^m>)}{\mathbb{V}[\beta_{\cdot,i,k}^+]} -1 \right)\\
+    &\hat{b}_i(\*\beta_{\cdot}) = (1-<\*\beta_{\cdot,i}^m>)\hat{a}_i(\beta_{\cdot,i}),
+    \end{split}
+\end{equation}
+ \noindent where $<\*\beta_{\cdot,i}^m>$ is the mean of the kernel locations and $Var(\*\beta^m)$ is the variance of the ensemble:
+\begin{equation}
+\begin{split}
+    &<\*\beta_{\cdot,i}^m> = a\*\beta_{\cdot,i,k}^{m+} + (1-a)\mathbb{E}[\*\beta_{\cdot,i,k}^{+}] \\
+\end{split}
+\end{equation}
+
+Uncertainty in remote sensing observations of agricultural activity (land and water allocations, crop yield and yield elasticity) as well as uncertainty in additional ancillary information (crop supply elasticity, crop price, cost of operating land and cost of water) obtained at time $k+1$ is represented by generating an ensemble with $M$ observations of replicates obtained by sampling from a Normal distribution centered at the observation:
+
+\begin{equation}
+    \begin{split}
+        &\overline{x}_{land,i,k+1}^m = \overline{x}_{land,i} + \nu_{land,i,k+1}^m, \qquad  \nu_{land,i,k+1}^m \sim \mathcal{N}\left(0, R_{k+1}^{x_{land}} \right)\\
+        &\overline{x}_{water,i,k+1}^m = \overline{x}_{water,i} + \nu_{water,i,k+1}^m, \qquad  \nu_{water,i,k+1}^m \sim \mathcal{N}\left(0, R_{k+1}^{x_{water}} \right)\\
+        &\overline{\pi}_{W,i,k+1}^m = \overline{\pi}_{W,i,k+1} + \nu_{\pi_W,i,k+1}^m, \qquad  \nu_{\pi_W,i,k+1}^m \sim \mathcal{N}\left(0, R_{k+1}^{\pi_W} \right)\\
+        &\overline{\pi}_{i,k+1}^m = \overline{\pi}_{i,k+1} + \nu_{\pi,i,k+1}^m, \qquad  \nu_{\pi,i,k+1}^m \sim \mathcal{N}\left(0, R_{k+1}^{\pi} \right)\\
+        &\overline{\eta}_{i,k+1}^m = \overline{\eta}_{i,k+1} + \nu_{\eta,i,k+1}^m, \qquad  \nu_{\eta,i,k+1}^m \sim \mathcal{N}\left(0, R_{k+1}^{\eta} \right)\\
+        &p_{i,k+1}^m = p_{i,k+1} + \nu_{p,i,k+1}^m, \qquad  \nu_{p,i,k+1}^m \sim \mathcal{N}\left(0, R_{k+1}^{p} \right)\\
+        &c_{land,i,k+1}^m = c_{land,i} + \nu_{cland,i,k+1}^m, \qquad  \nu_{cland,i,k+1}^m \sim \mathcal{N}\left(0, R_{k+1}^{c_{land}} \right)\\
+        &c_{water,i,k+1}^m = c_{water,i} + \nu_{cwater,i,k+1}^m, \qquad  \nu_{cwater,i,k+1}^m \sim \mathcal{N}\left(0, R_{k+1}^{c_{water}} \right),
+    \end{split}
+\end{equation}
+
+\noindent where $\overline{x}_{land,i}^m, \overline{x}_{water,i}^m, \overline{\pi}_{W,i}, \overline{\pi}_{W,i}, \text{ and } \overline{\eta}_i $, are observations of land and water used by crops, elasticity of production to water inputs, crop production, and elasticity of production to crop prices, respectively. Observations are scaled into a dimensionless quantity (see section \ref{sec:scaling_obs}). 
+    
+Assimilation of new observations obtained at time $k+1$ to correct each member $m$ of the parameter ensemble is achieved using the update equations of the enKF:  
+
+\begin{equation}\label{eq:recursive_bayes}
+    \begin{split}
+    &\theta_{i,k+1}^{m+} = \theta_{i,k+1}^{m} + K_{k+1} \left( LHS^m_{i,k+1} - RHS(\theta_{i,k+1}^{m})\right)\\
+    &K_{k+1} = \*C^{\theta,RHS}_{k+1} \left[\*C^{LHS}_{k+1} + \*C^{RHS}_{k+1}\right]^{-1},\\
+    \end{split}
+\end{equation}
+
+\noindent where $\theta_{i,k+1}^{m+}$ is the corrected (posterior) $m$th member of the model parameters, $K_{k+1}$ is the Kalman gain matrix that corrects the parameter trajectories; ${LHS}^m_{i,k+1}$ is the $m$th member of the ensemble of replicates of the left hand side of the system of optimality conditions, which holds observation and other derived quantities; $RHS(\theta_{i,k+1}^{m})$ is the $m$th member of the ensemble of replicates of the right hand side of the optimality conditions, which is a function of model parameters, and holds predictions of the $LHS$;   $\*C^{\theta,LHS}_{k+1}$  is the cross-covariance between the parameter ensemble and the RHS ensemble, $\*C^{LHS}_{k+1}$ is the covariance of the LHS ensemble and $\*C^{RHS}_{k+1}$ is the covariance of the RHS ensemble. 
+
+The quantity between brackets in the top equation of \eqref{eq:recursive_bayes} is called the innovation and holds the model prediction errors. A property of Kalman filters is that when they are properly tuned, the ensemble of parameters produce a sequence of innovations that is normally distributed with zero mean. Since LHS and RHS represent the left and right hand sides of the optimality conditions, Eq. \ref{eq:recursive_bayes} is in effect solving the maximization problem posed in Eq. \ref{eq:net_revs}. The variance of the innovation is the total variance of the process associated with observation and parameter uncertainty. 
+
+
+% Symbols in boldface within $\*\theta$ indicate vectors of parameters for all crops in an economic unit(i.e $\*\mu = [\mu_1,\dots, \mu_I]^T$).  
+
+% where $\*\theta_{k+1}^m$ is an augmented vector concatenating vectors of parameters that hold individual parameter values for each crop grown in a given economic unit:
+
+% \noindent where $\*K_k$ is the Kalman gain, $\*{LHS}_k$ is the left hand side of the optimality conditions (left hand side of \eqref{eq:optimality_program}), which represent the marginal costs of agricultural production and other observations of agricultural activity:
+
+% \begin{equation}
+% \*{LHS}^m = \left[ LHS_i^m,\dots,LHS_I^m\right]^T,
+% \end{equation}
+
+The $LHS_i$ ensemble is produced by reorganizing the nonlinear system of optimality conditions (Eq.\eqref{eq:optimality_program}) such that observed quantities are grouped in the left hand side of the system. Using the observation replicates, individual $LHS_i$ ensemble members are produced:
+
+\begin{equation}
+LHS_{i, k+1}^m = 
+\begin{blockarray}{ccc}
+\begin{block}{[c]cc}\label{eq:LHS}
+    -p_i^m\, \overline{\pi}_i^m \, \overline{\pi}_{W,i}^m & &(1)\\
+    p_i^m \,\overline{\pi}_i^m \, \overline{\pi}_{W,i}^m & &(2)\\
+    \overline{\eta_i}^m & &(3)\\
+    \overline{\pi}_{W,i}^m& &(4)\\
+    \overline{\pi_i}^m& &(5)\\
+    \sum_{i=0}^{I} \left(2\, \overline{x}_{land,i}^m \,p_i^m \,\overline{\pi}_i^m \,\overline{\pi}_{W,i}^m \right) & &(6)\\
+    1& &(7)\\
+    0& &(8)\\
+    0&_{k+1} &(9)\\ 
+\end{block}
+\end{blockarray}
+\end{equation}
+
+\noindent where the first two elements are part of the calculation of the marginal costs of production, the next two elements are observations of production elasticity to crop price and used water, respectively, the fifth element is the observations of crop production and the last three elements are the left hand side of three constraints to encourage sampling $\beta$ parameters such as $\beta_{land,i} + \beta_{water,i}=1, \beta_{\cdot,i}\geq 0$.
+
+The $RHS(\theta_{k+1})$ ensemble is the right hand side of the optimality conditions, which is a function of model parameters. Using parameter and input replicates, the right hand side equations are used to produce model prediction replicates of $LHS_{i, k+1}$:
+
+% \begin{equation}\label{eq:RHS}
+%     \*{RHS}(\*\theta_k^{m}) = \left[ RHS(\*\theta_{i,k}^{m}),\dots,RHS(\*\theta_{I,k}^{m})\right]^T,
+% \end{equation}
+
+\begin{equation}
+    RHS(\theta_{i,k+1}^{m}) = 
+    \begin{blockarray}{cccc}
+    \begin{block}{[cc]cc}\label{eq:RHS}
+        & \left(c_{land,i}^m + \lambda_{land,i}^m + \overline{\lambda}_{fsl}^m \right) \overline{x}_{land,i}^m - p_i^m\, \overline{\pi}_i^m \,\delta_i^m & &(1)\\
+        & \left(c_{water,i}^m + \lambda_{water,i}^m \right) \overline{x}_{water,i}^{*m} & &(2)\\
+        & \frac{\delta_i^m} {1 - \delta_i^m} \left\{1 - \frac{\frac{b_i} {\delta_i^m \left(1 - \delta_i^m\right)}}{\sum_{i}\left[\frac{b_{i}}{\delta_i^m\left(1-\delta_i^m \right) } + \frac{\sigma_{i}^m b_i\overline{\pi}_{W,i}^m} {\delta_i^m\left(\delta_i^m - \overline{\pi}_{W,i}^m \right) }\right]}\right\}, \quad b_{i} = \frac{(\overline{x}_{land,i}^{m})^2}{p_{i}^m\,\overline{\pi}_{i}^m}  & &(3)\\
+        & \delta_{i}^m\left(\frac{\beta_{water,i}^m(\overline{x}_{water,i }^m)^{*\rho_i}} {\beta_{land,i }^m(\overline{x}_{land,i}^m)^{\rho_i} + \beta_{water,i}^m (\overline{x}_{water,i}^m)^{*\rho_i}} \right) & &(4)\\
+        & \mu_i^m \left[\beta_{land,i}^m(\overline{x}_{land,i}^m)^{\rho_i} + \beta_{water,i}^m(\overline{x}_{water,i}^m)^{*\rho_i} \right]^{\frac{\delta_i^m}{\rho_i}} & &(5)\\
+        & \sum_{i=0}^I \left[ -2 (c_{land,i}^m + \overline{\lambda}_{fsl}^m)\, (\overline{x}_{land,i}^m)^2 + 2\,\overline{x}_{land,i}^m\,p_i^m\,\overline{\pi}_i^m\,\delta_i^m \right] & &(6)\\
+        & \beta_{land_i}^m + \beta_{water_i}^m & &(7)\\
+        & \beta_{land_i}^m - \lvert \beta_{land_i}^m \rvert & &(8)\\
+        & \beta_{water_i}^m - \lvert \beta_{water_i}^m \rvert &_{k+1} &(9)\\
+\end{block}
+\end{blockarray}
+\end{equation}
+
+The first two elements of $LHS_i^m$ and $RHS_i^m$ represent the difference between marginal costs of production and marginal revenues with respect to land and water. Marginal costs and marginal revenues are equal at the optimal point. The next two elements of $RHS_{i,k+1}^m$ are model predictions of production elasticity to crop price and used water, respectively; the fifth element is the observation of crop production. The last three elements of $LHS_i^m$ and $RHS_i^m$ are constraints to encourage sampling   $\beta$ parameters within the unit simplex, such as $1 = \beta_{land,i} + \beta_{water,i}, \beta_{\cdot,i}\geq 0$. The last two constraints are the non-negativity conditions. Non-negative $\beta$ samples occur when the difference between the sample and its absolute is zero.  
+
+
+\subsection{Scaling observations and inputs}\label{sec:scaling_obs}
+
+If the $\beta$ parameters are considered dimensionless share quantities, the constant elasticity of substitution production function specified in Eq. \eqref{eq:produc_func} is dimensionally inconsistent and its results are not interpretable in terms of processes unless inputs are scaled and transformed to dimensionless quantities. For a particular season, the information needed to correct the model parameters for an economic unit include observations of land ($x^{obs}_{land,i}$, \si{\hectare}) and water ($x^{obs}_{water,i}$ \si{\milli\meter\per\hectare}) used by crop $i$, crop price ($p^{obs}_i$, \$\si{\per\tonne}), the typical cost of cultivating crop $i$ per unit of land ($c^{obs}_{land}$ \$\si{\per\hectare}), the cost of applying a unit of water including fees, transportation, application costs, etc ($c^{obs}_{water}$ \$/(\si{\milli\meter\hectare}), average crop yield over the economic unit ($y^{obs}_i$, \si{\tonne\per\hectare}), the elasticity of production to water ($\pi_{Wi}^{obs}$, dimensionless), and the elasticity of production to crop prices ($\eta^{obs}_i$, dimensionless). 
+
+The dimensionless observed quantities used in the data assimilation and parameter correction process are obtained by applying the following transformations:
+
+\begin{equation}
+    \begin{split}
+        &\overline{x}_{land,i} = \frac{x^{obs}_{land,i}}{x^{ref}_{land,i}}\\
+        &\overline{x}_{water,i} = \frac{x^{obs}_{water,i}}{ET^{ref}_i * x^{ref}_{land,i}}\\
+        &\overline{x}_{precip,i} = \frac{x^{est}_{precip,i}}{ET^{ref}_i}\\
+        &\overline{\pi}_i = \frac{y^{obs}_i x^{obs}_{land,i}}{y^{ref}_ix^{ref}_{land,i}}\\
+        &p_i = \frac{p^{obs}_i}{p^{ref}_i}\\
+        &c_{land,i} = \frac{c^{obs}_{land,i}}{p^{ref}_i y^{ref}_i}\\
+        &c_{water,i} = x^{obs}_{water,i}\frac{ET^{ref}_i x^{ref}_{land,i}}{p^{ref}_i y^{ref}_i},\\
+    \end{split}
+\end{equation}
+
+\noindent where $y^{obs}_i$ is the mean observed yield in the economic unit ($\si{\kilo\gram\per\hectare}$),  $x^{est}_{precip,i}$ is the estimated or expected crop water use from natural water sources (e.g. from precipitation) in $\si{\milli\meter}$, and $x^{ref}_{land,i}$ in $\si{\hectare}$, $ET^{ref}_i$ in $\si{\milli\meter}$, $p^{ref}_i$ in $\$\si{\per\kilo\gram}$ and $y^{ref}_i$ in $\si{\kilo\gram\per\hectare}$ are long term mean land, used water, price and yield observations used as reference scaling quantities for crop $i$.
+
+Elasticity to water and prices measures how responsive their production is to used water and crop prices and is defined as a percent change in production over a percent change in used water or crop price. Defining $\pi^{obs}_i = y^{obs}_i x^{obs}_{land,i}$, elasticities can be calculated from observations as: 
+
+\begin{equation}
+    \label{eq:elast_water}
+    \overline{\pi}_{W,i} = \frac{\Delta \pi_i^{obs}/ \pi^{obs}_i}{\Delta x^{obs}_{water,i}/x^{obs}_{water,i}} = \frac{d\log \pi^{obs}_i}{d\log x^{obs}_{water,i}}
+\end{equation}
+\begin{equation}\label{eq:elast_supply}
+    \overline{\eta}_i = \frac{\Delta \pi^{obs}_i/ \pi^{obs}_i}{\Delta p^{obs}_i/p^{obs}_i} = \frac{d\log \pi^{obs}_i}{d\log p^{obs}_i}\\
+\end{equation}
+
+Elasticities are typically considered constant over a period of time and they can be obtained as the least square regression slope between the logarithm of production and the logarithm of water used or the logarithm of crop prices over the considered period. 
+
+\subsection{Economic component at simulation time}
+
+The posterior parameter distribution obtained after the most recent assimilation step $K$ is used in the production and cost functions of the net revenue equation \eqref{eq:net_revs}. For each member in the parameter ensemble, the maximization problem is solved, this time for land and water allocation under any simulation scenario represented by different crop prices, production costs, and land and water constraints: 
+
+\begin{equation}\label{eq:net_revs_simul_time}
+    \begin{split}
+        \max_{x^m_{land, i} , x^m_{water, i} \geq 0 } net^m =\\
+        &\quad \sum_{i} \left\{ p_i \pi^m_i\left( x_{land,1}, x_{water,i} + x_{precip,i}; \mu^{m+}_{i,K}, \beta^{m+}_{land,i,K},\beta^{m+}_{water,i,K}, \rho_{i}, \delta^{m+}_{i,K} \right) \right. \\
+        &- \left(c_{land,i} + \lambda^{m+}_{land,i,K} + \overline{\lambda}^{m+}_{fsl,K} \right) x^m_{land,i} \\
+        &- \left. \left( c_{water,i} + \lambda^{m+}_{water,i,K} \right) x^m_{water,i} \vphantom{\sum} \right\} \\
+        \text{subject to} & \quad\sum_{i} x^m_{land,i} \leq \overline{L} \left[ \overline{ \lambda }^m_{ land } \right]\\
+        & \quad\sum_{i} x^m_{water, i} \leq \overline{W} \left[ \overline{ \lambda }^m_{ water } \right]
+    \end{split}
+\end{equation}
+
+Maximization of equation \eqref{eq:net_revs_simul_time} for each member $m$ of the parameter ensemble generates a result ensemble that represents the probability distribution of land and water allocated to each crop $i$ as well as an ensemble of the Lagrange multipliers $\overline{ \lambda }^m_{ land }$ and $\overline{ \lambda }^m_{ water }$ associated with  total land $\overline{L}$ and water $\overline{W}$ resource constraints imposed by physical availability or policy. Lagrange multipliers represent  the opportunity cost associated with not having an additional unit of land or water and therefore can be interpreted as a metric of the value of land and water. Additionally, solving equation \eqref{eq:net_revs_simul_time} also produces the probability distribution of estimated crop production, and of the probability distribution of production elasticity of supply and production elasticity of water inputs. 

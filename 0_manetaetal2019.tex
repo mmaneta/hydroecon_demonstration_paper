@@ -1,0 +1,159 @@
+\documentclass[review]{elsarticle}
+\usepackage[left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage{lineno,hyperref}
+\usepackage{threeparttable, tablefootnote}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{url}
+\modulolinenumbers[5]
+%\usepackage[nomarkers,figuresonly]{endfloat}
+
+\journal{Environmental Modeling and Software}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% Elsevier bibliography styles
+%%%%%%%%%%%%%%%%%%%%%%%
+%% To change the style, put a % in front of the second line of the current style and
+%% remove the % from the second line of the style you would like to use.
+%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Numbered
+%\bibliographystyle{model1-num-names}
+
+%% Numbered without titles
+%\bibliographystyle{model1a-num-names}
+
+%% Harvard
+\bibliographystyle{model2-names.bst}\biboptions{authoryear}
+
+%% Vancouver numbered
+%\usepackage{numcompress}\bibliographystyle{model3-num-names}
+
+%% Vancouver name/year
+%\usepackage{numcompress}\bibliographystyle{model4-names}\biboptions{authoryear}
+
+%% APA style
+%\bibliographystyle{model5-names}\biboptions{authoryear}
+
+%% AMA style
+%\usepackage{numcompress}\bibliographystyle{model6-num-names}
+
+%% `Elsevier LaTeX' style
+%\bibliographystyle{elsarticle-num}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsbsy}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{blkarray}
+\usepackage{bm}
+\usepackage{graphicx}
+% Definitions.
+\def\*#1{\bm{#1}}
+
+\DeclareSIUnit\year{yr}
+
+\def\bSigma{{\boldsymbol \Sigma}}
+%\def\L{{\cal L}}
+\def\Real{{\mathbbm{R}}}
+\def\Comp{{\mathbbm{C}}}
+
+\graphicspath{ {./Figures/} }
+
+\newsavebox\labelbox
+
+\savebox\labelbox{$\begin{matrix}
+\refstepcounter{equation}(\theequation)\label{aa}\\
+\refstepcounter{equation}(\theequation)\label{bb}\\
+\refstepcounter{equation}(\theequation)\label{cc}\\
+\refstepcounter{equation}(\theequation)\label{dd}\\
+\refstepcounter{equation}(\theequation)\label{ee}\\
+\refstepcounter{equation}(\theequation)\label{ff}\\
+\refstepcounter{equation}(\theequation)\label{gg}\\
+\refstepcounter{equation}(\theequation)\label{hh}\\
+\refstepcounter{equation}(\theequation)\label{ii}
+\end{matrix}$}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{A SATELLITE-DRIVEN HYDRO-ECONOMIC MODEL TO SUPPORT AGRICULTURAL WATER RESOURCES MANAGEMENT}
+%\tnotetext[mytitlenote]{Fully documented templates are available in the elsarticle package on \href{http://www.ctan.org/tex-archive/macros/latex/contrib/elsarticle}{CTAN}.}
+
+%% Group authors per affiliation:
+\author[mycorrespondingauthor]{Maneta M. P.\corref{mycorrespondingauthor}}
+\author{Kimball, J.S}
+\author{He, M.}
+\author{Silverman, N. L.}
+\author{Chaffin, B.}
+\address{Geosciences Department, University of Montana, Missoula, MT}
+\fntext[myfootnote]{marco.maneta@umontana.edu}
+
+\author{Maxwell, B.}
+\author{Ewing, S.}
+
+\address{Land Resources and Environmental Sciences, Montana State University, Bozeman, MT}
+
+
+\author{Cobourn, K.}
+\address{Department of Forest Resources and Environmental Conservation, Virginia Tech, Blacksburg, VA}
+
+\author{Ji, X.}
+\address{Department of Economics and Environmental Studies Program, Brandeis University, Waltham, MA}
+
+%% or include affiliations in footnotes:
+%\author[mymainaddress,mysecondaryaddress]{Elsevier Inc}
+%\ead[url]{www.elsevier.com}
+
+%\author[mysecondaryaddress]{Global Customer Service\corref{mycorrespondingauthor}}
+\cortext[mycorrespondingauthor]{Corresponding author}
+%\ead{support@elsevier.com}
+
+%\address[mymainaddress]{1600 John F Kennedy Boulevard, Philadelphia}
+%\address[mysecondaryaddress]{360 Park Avenue South, New York}
+
+\begin{abstract}
+The management of water resources among competing uses presents a complex technical and policy challenge.  Integrated hydro-economic models capable of simulating the hydrologic system in irrigated and non-irrigated regions and the response of farmers to hydrologic constraints and economic and policy incentives, provide a framework to understand biophysical and socioeconomic implications of changing water availability.  We present a transformative hydro-economic model of agricultural production driven by multi-sensor satellite observations, outputs from regional climate models, and socioeconomic data. Our approach overcomes the limitations of current decision support systems for agricultural water management and provides policymakers and natural resource managers with satellite data-driven, state-wide, operational models capable of anticipating how farmers allocate water, land, and other resources when confronted with new climate, policy rules, or market signals. It also quantifies how farming decisions affect agricultural the water supply system. The model is demonstrated in an application to quantify drought-related impacts in Montana. 
+\end{abstract}
+
+\begin{keyword}
+hydro-economic models, positive mathematical programming, data assimilation, decision support systems
+\end{keyword}
+
+\end{frontmatter}
+
+\linenumbers
+
+\section*{Software availability}
+The Python modeling package presented in this work is available free of charge through the BitBucket repository \url{https://bitbucket.org/umthydromodeling/dawuap.git} (version 0.1beta). The data assimilation Water Use and Agricultural Productivity (daWUAP) package was developed by Marco Maneta (marco.maneta@umontana.edu) and was made publicly available in April 2020. The package is written in pure Python version 3.7 and has been tested within the Anaconda Python environment on Linux and Mac OSX operating systems.
+
+\input{1_introduction.tex}
+
+\input{2_models.tex} 
+
+\input{3_calib_econ.tex}
+
+\input{4_ApplicationMontana.tex}
+
+\input{5_Results.tex}
+
+\input{6_Discussion.tex}
+
+\input{7_Conclusions}
+
+\section*{References}
+
+\bibliography{manetaetal2020}
+
+\appendix
+\input{appendix_hydro.tex}
+\input{appendix_econ.tex}
+
+
+\end{document}
+
+

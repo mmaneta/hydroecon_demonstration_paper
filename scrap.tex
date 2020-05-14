@@ -1,0 +1,46 @@
+
+
+
+1.1. Preliminary work 
+
+
+An important characteristic of 
+
+
+models calibrated using PMP is that they relate agricultural production (yield and profit) to agricultural input variables (e.g. crop mix, acreage, water applied) using observed farmer response, not the physiology of the crop or other agronomic information. This is important because, when calibrated this way, the model captures the actual behavior of farmers and their actual reaction to external factors, such as droughts and risk, rather than the behavior that would be optimal from a purely agronomic point of view. The economic behavior of farmers is motivated by a desire to maximize profit but also driven by culture, personal experience, and tradition, among other factors, which are often developed to reduce risk. These important features that drive the economic behavior of farmers are captured using the PMP methodology. 
+
+Models based on PMP have been used intensively in drought analysis and policy design in California (Connell-Buck et al. 2011; Medellín-Azuara et al. 2011). These models are at the heart of the Statewide Agricultural Production Model (SWAP, Howitt et al. (Howitt et al. 2012)), which is used in the agricultural economic component of the CALVIN model of the California water system (Draper et al. 2003). SWAP is also used for policy analysis by the California Department of Water Resources (Department of Water Resources 2009) and the U.S. Department of the Interior’s Bureau of Reclamation (US Bureau of Reclamation 2011). Our team members have also used it to calibrate spatially-explicit, coupled hydrologic-economic models (Maneta et al. 2009a; Maneta et al. 2009c; Cobourn and Crescenti 2011). 
+
+PMP is a well-established method of calibrating hydro-economic models, but its predictive ability hinges on the quality and quantity of the data that it uses to reflect observed farmer behavior. To date, PMP-based hydro-economic models are calibrated using costly survey data. This project will capitalize on the wealth of operational remote sensing data products and algorithms that are becoming available at little to no cost to improve the PMP calibration. Our team contains extensive experience in the design and application of remote sensing algorithms for regional to global scale assessment and monitoring of vegetation. Relevant experience includes the development and use of satellite microwave sensor based parameter retrievals for ecosystem studies (Jones et al. 2010; Jones and Kimball 2010; Jones et al. 2012); development of enhanced retrieval of plant biomass and phenology by fusing synergistic satellite optical-infrared and microwave remote sensing information (Kimball et al. 2009; Mu et al. 2009); documenting and improving the accuracy of satellite based time series of vegetation productivity (Heinsch et al. 2006; Kimball et al. 2007; Zhang et al. 2007) and evapotranspiration (Zhang et al. 2010). 
+To take advantage of the high temporal frequency of remote sensing information we will leverage a second key enhancement of the PMP method (Maneta and Howitt 2014). This methodological extension permits recursive assimilation of remote sensing information using a stochastic data assimilation framework that overcomes two major limitations of classic PMP: 1) it now permits more robust model calibration by blending new and past information during the calibration process, avoiding over-calibration for the conditions of a single year; and 2) it generates predictions of resource allocation in terms of probability distributions that reflect the quality of the calibration and the uncertainty in the observations of agricultural activity.
+The stochastic data assimilation framework is based on the equations of the ensemble Kalman filter (Evensen 2003) , which permits recursive updates of the mean and covariance of the economic model parameters as new observations of agricultural activity become available (Error: Reference source not found).  As more information is assimilated, the algorithm will improve the identification of the model parameters, which over time will converge to a distribution that reflects the quality of the observations being assimilated. Uncertainty in the model parameters and in the hydrologic conditions are also reflected in the prediction of resource allocation in the form of probability distributions (Error: Reference source not founda). Once the model is calibrated, it can be used to predict and study how farmers are likely to reallocate resources under various conditions by running the model under different scenarios of crop prices and costs of agricultural inputs, or under different levels of water and land restrictions due to environmental or policy factors (Error: Reference source not foundb). The probability distribution of the model parameters also permits an interpretation that provides insight into how risk influences producer decision-making and adaptation. We propose to build on this model component to identify and understand how the variance of critical economic and hydrologic parameters affects producer decision-making about resource use and the corresponding
+
+
+
+1) We will exploit new satellite-based remote sensing methods and products to calibrate our hydro-economic model. Specifically, we propose to ingest remote sensing data into a positive mathematic programming (PMP; Howitt 1995) approach to capture previously underrepresented factors that influence farmer decision-making. This will allow us to operationalize a hydro-economic model that spans a wider geographic scope than previous studies, with the potential to move hydro-economic modeling from the watershed to the sub-continental scale. 
+2) We will implement a modeling approach based on recursive Bayesian inference that will permit us to evaluate the quality of the predictions based on the quality of the data (Maneta and Howitt 2014). It will also allow us to evaluate explicitly how changes in risk and uncertainty influence producer decision-making. This is a critical innovation given that the IPCC (2014) recently recognized that risk plays an important, and understudied, role in driving producer adaptation to climate change. 
+3) We will trace the effect of producer decision-making on regional hydrologic systems. This innovation allows us to understand how behavior affects the availability of water in the future, and also how the water-use decisions of individuals propagate through the hydrologic system to influence the behavior of downstream water users. 
+
+
+The presented model will permit to analyze the incentives that drive farmers' adaptation to changing natural conditions, and the hydrologic consequences of 
+
+
+
+The objective of this project is to develop a transformative decision support tool that will allow policymakers and natural resource managers to understand the incentives that drive farmers’ adaptation to changing natural conditions, as well as the environmental consequences of adaptive behavior.  To do so, we propose a state-of-the-art integrated hydro-economic model that leverages recent advances in remote sensing science and in data assimilation methods to enable automatic model updates and refinements as new information on farming activity becomes available. Our methodology does not aim at optimizing the way farmers should allocate land, water, and other resources under different resource constraints. More importantly for policymaking is its capability to anticipate how they will allocate these resources, and the impact of their decisions on agricultural water demands, agricultural productivity and farm profits. Our methodology is designed for analysis at the farm or county scales and reveals how farmers react and reallocate resources seasonally when confronted with new climate, policy rules, or market signals. 
+
+Hydro-economic models, such as the modeling approach we propose, overcome these limitations, and provide a promising basis for an operational water management tool. 
+
+ 
+
+
+
+
+
+ The resulting model will contribute to the next generation of decision support tools used in water policy analysis. Our proposed decision support tool is poised for use as a continuous, operational policy support system because the response of farmers to changing conditions can be continually updated using recursive inference methods from frequently available remote sensing information. This tool will support improved policy analysis to decide how to use water resources, including where to invest in water development infrastructure, how to design adaptation pathways, how to estimate water value, and how to manage water banks and other water marketing tools.
+ 
+ 
+ 
+ 
+ Furthermore, the deterministic nature of the standard positive mathematical programming method discourages any analysis to characterize prediction uncertainties. Without formally propagating input and parameter uncertainties to the model outputs, model users may get an unjustified sense of precision and an excessive confidence in the model results. 
+ 
+ 

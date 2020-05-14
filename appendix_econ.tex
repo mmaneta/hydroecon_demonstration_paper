@@ -1,0 +1,87 @@
+%\appendix
+\section{Economic model}
+\label{app:economic_model}
+
+Here we briefly outline the economic optimization program using the standard Positive Mathematical Programming (PMP), following \citet{Howitt1995, Merel2011b} and \citet{Garnache2017}. The economic program is implemented in two step: in the first step, parameters for the economic model are calibrated such that the program mimics the observed land and water use decisions. In the second step, the model simulates farmer's land use and water use responses given these model parameters along with other exogenous factors such as availability of supplemental irrigation water. The following subsections briefly outline the calibration and the simulation process at each simulation time. 
+
+\subsection{Calibration}
+\label{app:economic_model_calib}
+The fundamental aspect of our economic program is that farmers allocate resources with the objective of maximizing net revenues, where the revenue function follows a generalized constant elasticity of substitution (CES) functional form: 
+\begin{equation}\label{eq:econ_calibration}
+    \begin{split}
+    \max _ { x _ { land,i } , x _ { water,i } } & \quad \sum _ { i } \left\{ p _ { i } \mu _ { i } \left[ \beta _ { land,i } x _ { land,i } ^ { \rho _ { i } } + \beta _ { water,i } (x_{precip,i} + x _ { water,i }) ^ {\rho _ { i } } \right] ^ { \frac { \delta _ { i } } { \rho _ { i } } } \right.\\
+    & \left. \quad - \left( c _ { land,i } + \lambda _ { land,i } \right) x _ { land,i } - \left( c _ { water,i } + \lambda _ { water,i } \right) x _ { water,i } \vphantom{\sum_i} \right\} \\
+    \text{subject to} & \quad \sum _ { i } x _ { land,i } \leq \overline { L } \left[ \overline { \lambda } _ { land } \right] \\ 
+    & \quad \sum _ { i } x _ { water,i } \leq \overline { W } \left[ \overline { \lambda } _ { water } \right] \\
+    & \quad x_{land,i}, x_{water,i} \geq 0 \\
+    \end{split}
+\end{equation}
+where $i = 1,...,I$ indexes crops; $l=land,water$ indexes land and water inputs. We differentiate water inputs into an exogenous component $x_{precip,i}$, which captures water provided by natural sources like precipitation, and an endogenous component $x_{water,i}$, which captures supplemental irrigation water provision. Total water application will be the summation of the two, i.e.
+\begin{equation*}
+    x^*_{water,i} \equiv x_{precip,i} + x_{water,i}
+\end{equation*}
+
+The unknown parameters in Equation~\ref{eq:econ_calibration} are $\mu _ { i } , \beta _ { i l } , \rho _ { i } , \delta _ { i } , \lambda _ { i l } , \overline { \lambda } _ { 1 }$; and the known values are:
+
+\begin{itemize*}
+    \item $\overline { \eta } _ { i }$: exogenous supply elasticity for crop i (\% change in supply over \% change in crop price)
+    \item $\overline { q } _ { i }$: observed crop production for crop $i$
+    \item $\overline { x } _ { land,i }$: observed land allocation for crop $i$
+    \item $\overline { x } _ { water,i} ^{*}$: observed ET (total) for crop $i$
+    \item $\overline { y } _ { i W}$: reference yield elasticity with respect to water for crop $i$ (\% change in production over \% change in total ET)
+    \item $\sigma_i$: elasticity of substitution for crop $i$
+    \item $p_i$: unit price of crop $i$
+    \item $c_{il}$: per-unit input costs of production for crop $i$, input $l$
+    \item $\overline { L }$: total arable land
+    \item $\overline{W}$: total amount of supplemental irrigation water available
+\end{itemize*}
+
+Given the above maximization problem, the unknown parameters can be calibrated via positive mathematical programming, using the following set of calibration equations: 
+
+\begin{equation}\label{eq:optimality_program}
+    \begin{split}
+        & \rho _ { i } = \frac { \sigma _ { i } - 1 } { \sigma _ { i } } \text { for } i = 1 , \ldots , I \\
+        & \overline { \eta } _ { i } = \frac { \delta _ { i } } { 1 - \delta _ { i } } \left\{ 1 - \frac { \frac { b _ { i } } { \delta _ { i } \left( 1 - \delta _ { i } \right) } } { \sum _ { j } \left[ \frac { b _ { j } } { \delta _ { j } \left( 1 - \delta _ { j } \right) } + \frac { \sigma _ { j } b _ { j } \overline { y } _ { j W } } { \delta _ { j } \left( \delta _ { j } - \overline { y } _ { j W } \right) } \right] } \right\} \text { for } i = 1 , \ldots , I , \text {where } b _ { i } = \frac { \overline { x } _ { land,i } ^ { 2 } } { p _ { i } \overline { q } _ { i } } \\
+        & \overline {y}_{iW} = \delta _ { i } \left( \frac { \beta _ { water,i } \overline { x } _ { water,i } ^ { * \rho _ { i } } } { \beta _ { land,i } \overline { x } _ { land,i } ^ { \rho _ { i } } + \beta _ { water,i } \overline { x } _ { water,i } ^ { * } \rho _ { i } } \right) \text { for } i = 1 , \ldots , I \\
+        & \beta _ {land, i  } + \beta_{water,i} = 1 \text { for } i= 1 , \ldots , I \\
+        & \overline { q } _ { i } = \mu _ { i } \left[ \beta _ { land,i } \overline { x } _ { land,i } ^ { \rho _ { i } } + \beta _ { water,i } \overline { x } _ { water,i } ^ { * \rho _ { i } } \right] ^ { \frac { \delta _ { i } } { \rho _ { i } } } \text { for } i = 1 , \ldots , I \\
+        & \overline { \lambda } _ { 1 } = \frac { \sum _ { i } \left[ p _ { i } \overline { q } _ { i } \left( \delta _ { i } - \overline { y } _ { i W } \right) - c _ { land,i } \overline { x } _ { land,i } \right] \overline { x } _ { land,i } } { \sum _ { i } \left( \overline { x } _ { land,i } ^ { 2 } \right) } \\
+        & p _ { i } \overline { q } _ { i } \left( \delta _ { i } - \overline { y } _ { i W } \right) = \left( c _ { land,i } + \lambda _ { land,i } + \overline { \lambda } _ { 1 } \right) \overline { x } _ { land,i } \text { for } i = 1 , \ldots , I \\
+        & p _ { i } \overline { q } _ { i } \overline { y } _ { i W } = \left( c _ { water,i } + \lambda _ { water,i } \right) \overline { x } _ { water,i } ^ { * } \text { for } i = 1 , \ldots , I
+    \end{split}
+\end{equation}
+
+\subsection{Simulation}
+After calibrating the model parameters, the optimization framework can now be used to analyze how farmer behaviors will change given changes in exogenous environmental and economic factors, including water availability, crop prices, and production costs. 
+
+The simulation problem is given by the following maximization problem:
+\begin{equation}\label{eq:econ_simulation}
+\begin{split}
+    \max _ { x _ { land,i } , x _ { water,i }} &  \sum _ { i } \left\{ p _ { i } \mu _ { i } \left[ \beta _ { land,i } x _ { land,i } ^ { \rho _ { i } } + \beta _ { water,i } x _ { water,i } ^ { * } \rho _ { i } \right] ^ { \frac { \delta _ { i } } { \rho _ { i } } } \right.\\
+    & \left. - \left( c _ { land,i } + \lambda _ { land,i } \right) x _ { land,i } - \left( c _ { water,i } + \lambda _ { water,i } \right) x _ { water,i } \vphantom{\sum_i} \right\} \\
+    \text{subject to } & \sum _ { i } x _ { land,i } \leq \overline { L } \left[ \overline{\lambda} _ { land } \right] \\
+    & \sum _ { i } x _ { water,i } ^ { * } \leq \overline { W } \left[ \overline{\lambda} _ { water } \right] \\
+    & \text {and } x _ { water,i } \geq 0 \left[ \xi _ { i } \right]
+\end{split}
+\end{equation}
+where the unknown values are $x _ { land,i } , x _ { water,i }$, the land and water inputs for crop $i$; $q _ { i }$, the total production for crop $i$; and $\overline{\lambda} _ { land }, \overline{\lambda} _ { water }, \xi$, the Lagrangian multipliers. The known values include:
+\begin{itemize*}
+    \item $\mu _ { i } , \beta _ { i l } , \rho _ { i } , \delta _ { i } , \lambda _ { i l }$: model parameters determined from the calibration equations
+    \item $p _ { i } , c _ { i l } , x_{precip,i}, \overline { L } , \overline { W }$: crop prices, per unit production costs, water from natural sources, total arable land, and total supplemental irrigation water (same as in the calibration equation~\ref{eq:econ_calibration}).
+\end{itemize*}
+
+The simulation equations to solve the above maximization problem are given by:
+\begin{equation}
+\begin{split}
+    & \frac { p _ { i } \delta _ { i } q _ { i } \beta _ { land,i } x _ { land,i } ^ { \rho _ { i } } } { \beta _ { land,i } x _ { land,i } \rho _ { i } + \beta _ { water,i } x _ { water,i } ^ { * \rho _ { i } } } = \left( c _ { land,i } + \lambda _ { land,i } + \lambda _ { 1 } \right) x _ { land,i } \text { for } i = 1 , \ldots , I \\
+    & \frac { p _ { i } \delta _ { i } q _ { i } \beta _ { water,i } x _ { water,i } ^ { * \rho _ { i } } } { \beta _ { land,i } x _ { land,i } ^ { \rho _ { i } } + \beta _ { water,i } x _ { water,i } ^ { * } \rho _ { i } } = \left( c _ { water,i } + \lambda _ { water,i } + \lambda _ { 2 } + \xi _ { i } \right) x _ { water,i } ^ { * } \text { for } i = 1 , \ldots , I \\
+    & q _ { i } = \mu _ { i } \left[ \beta _ { land,i } x _ { land,i } ^ { \rho _ { i } } + \beta _ { water,i } x _ { water,i } ^ { * \rho _ { i } } \right] ^ { \frac { \delta _ { i } } { \rho _ { i } } } \text { for } i = 1 , \ldots , I \\
+    & \sum _ { i } x _ { land,i } = \overline { L } \text { for } i = 1 , \ldots , I \\
+    & \sum _ { i } x _ { water,i } ^ { * } = \overline { W } \text { for } i = 1 , \ldots , I
+\end{split}
+\end{equation}
+
+The simulation model will be able to recover farmers land and water use choices, $x_{land,i}$ and $x_{water,i}$, under the new set of exogenous conditions. The model will also be able to recover shadow values with respect to land and water inputs, $\overline{\lambda} _ { land }$ and $\overline{\lambda} _ { water }$.
+
+Note that this system of equations requires that the water constraint is binding. If the water constraint is non-binding, complementary slackness conditions need to be built to allow for the case in which $\lambda _ { water } = 0$.
+

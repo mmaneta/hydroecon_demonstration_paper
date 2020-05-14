@@ -1,0 +1,28 @@
+\begin{table}[]
+\resizebox{0.8\textwidth}{!}{%
+\centering
+\begin{threeparttable}
+\caption{Mean relative bias (Rel. Bias \tnote{a}) and relative root mean square error (Rel. RMSE\tnote{b}) statistics for the simulation land allocated during the 2008 benchmark conditions. }
+\label{tab:gof_spinup}
+
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+                          & \multicolumn{4}{c|}{2018}                                                         \\ \hline
+                          & \multicolumn{2}{c|}{Land Use}           & \multicolumn{2}{c|}{Water Use}          \\ \hline
+                          & \textit{Rel. Bias} & \textit{Rel. RMSE} & \textit{Rel. Bias} & \textit{Rel. RMSE} \\ \hline
+Alfalfa Irrigated         & -0.062             & 0.142              & -0.172             & 0.257              \\ \hline
+Alfalfa Nonirrigated      & -0.021             & 0.08              & -                  & -                  \\ \hline
+Barley Irrigated          & 1.826              & 1.939             & 2.694208           & 1.125              \\ \hline
+Barley Nonirrigated       & -0.020             & 0.018              & -                  & -                  \\ \hline
+Spring Wheat Irrigated    & -0.028             & 0.138              & 0.715453           & 1.00               \\ \hline
+Spring Wheat Nonirrigated & -0.020             & 0.014              & -                  & -                  \\ \hline
+Winter Wheat              & -0.019             & 0.062              & -                  & -                  \\ \hline
+\end{tabular}%
+
+\begin{tablenotes}\footnotesize
+\item [a] $Rel. Bias = \frac{sim_i - obs_i}{obs_i}$
+\item [b] $Rel. RMSE = \frac{\sqrt{\frac{1}{n}\sum_i^n(sim_i - obs_i)^2}}{\frac{1}{n}\sum_i^n obs_i}$
+\end{tablenotes}
+\end{threeparttable}
+}
+\end{table}
